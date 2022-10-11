@@ -82,9 +82,9 @@ class AdminSidebarMenu
                         }
                         if (auth()->user()->can('customer.view') || auth()->user()->can('customer.view_own')) {
                             $sub->url(
-                                action('ContactController@index', ['type' => 'customer']),
-                                __('report.customer'),
-                                ['icon' => 'fa fas fa-star', 'active' => request()->input('type') == 'customer']
+                                action('EmployeController@index'),
+                                __('employe'),
+                                ['icon' => 'fa fas fa-star', 'active' => request()->segment(1) == 'variation-templates']
                             );
      
                         }
