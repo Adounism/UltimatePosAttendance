@@ -46,15 +46,16 @@ class EmployeController extends Controller
     
 
         $request->validate([
-            'name' =>'required',
-            'faceId' =>'required',
-            'password' => 'required',
+            'firstName' =>'required',
+            'lastName' => 'required',
+            'contact' =>'required'
         ]);
 
         $employe = new Employe([
-            'name' => $request->get('name'),
-            'faceId' => $request->get('faceId'),
-            'password' => $request->get('password'),
+            'firstName' => $request->get('firstName'),
+            'lastName' => $request->get('lastName'),
+            'contact' => $request->get('contact'),
+            'faceId' => $request->get('faceId')
         ]);
 
         $employe->save();

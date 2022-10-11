@@ -62,6 +62,47 @@ class AdminSidebarMenu
                 )->order(10);
             }
 
+             //User Attendance Appoinment
+             if (auth()->user()->can('attendance.view')) {
+                $menu->dropdown(
+                    __('Pointage'),
+                    function ($sub) {
+
+                        if (auth()->user()->can('product.create')) {
+                            $sub->url(
+                                action('AttendanceController@index'),
+                                __('Employe Attendance'),
+                                ['icon' => 'fa fas fa-circle', 'active' => request()->segment(1) == 'variation-templates']
+                            );
+                            // $sub->url(
+                            //     action('ImportProductsController@index'),
+                            //     __('product.import_products'),
+                            //     ['icon' => 'fa fas fa-download', 'active' => request()->segment(1) == 'import-products']
+                            // );
+                        }
+                        if (auth()->user()->can('customer.view') || auth()->user()->can('customer.view_own')) {
+                            $sub->url(
+                                action('ContactController@index', ['type' => 'customer']),
+                                __('report.customer'),
+                                ['icon' => 'fa fas fa-star', 'active' => request()->input('type') == 'customer']
+                            );
+     
+                        }
+            
+
+                        if(!empty(env('GOOGLE_MAP_API_KEY'))) {
+                            $sub->url(
+                                action('ContactController@contactMap'),
+                                __('lang_v1.map'),
+                                ['icon' => 'fa fas fa-map-marker-alt', 'active' => request()->segment(1) == 'contacts' && request()->segment(2) == 'map']
+                            );
+                        }
+                    },
+                    ['icon' => 'fa fas fa-address-book', 'id' => "tour_step4"]
+                )->order(15);
+            }
+
+
             //Contacts dropdown
             if (auth()->user()->can('supplier.view') || auth()->user()->can('customer.view') || auth()->user()->can('supplier.view_own') || auth()->user()->can('customer.view_own')) {
                 $menu->dropdown(

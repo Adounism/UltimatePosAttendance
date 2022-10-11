@@ -13,10 +13,6 @@
 
 include_once('install_r.php');
 
-Route::resource('/employe', 'EmployeController');
-Route::resource('/attendance', 'AttendanceController');
-
-Route::post('/register_employer', 'EmployeController@store');
 
 Route::middleware(['setData'])->group(function () {
     Route::get('/', function () {
@@ -77,6 +73,12 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     // Route::resource('/employe', 'EmployeController');
 
     // Route::post('/register_employer', 'EmployeController@store');
+
+    Route::resource('/employe', 'EmployeController');
+    Route::resource('/attendance', 'AttendanceController');
+
+    Route::post('/register_employer', 'EmployeController@store');
+
 
     Route::post('check-mobile', 'ContactController@checkMobile');
     Route::get('/get-contact-due/{contact_id}', 'ContactController@getContactDue');

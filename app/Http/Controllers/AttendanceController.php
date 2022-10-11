@@ -1,12 +1,22 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Utils\ModuleUtil;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+use Yajra\DataTables\Facades\DataTables;
+use Spatie\Activitylog\Models\Activity;
+use Illuminate\Support\Facades\Auth;
 
 use App\Attendance;
 use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
 {
+
+    public function __construct(ModuleUtil $moduleUtil){
+        $this->moduleUtil = $moduleUtil;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,6 +24,13 @@ class AttendanceController extends Controller
      */
     public function index()
     {
+
+        // $user_id = request()->session()->get('user.id');
+        $attendances = Attendance::all();
+
+        // if (!auth()->user()->can('user.view') && !auth()->user()->can('user.create')) {
+        //     abort(403, 'Unauthorized action.');
+        // }
         $attendance = Attendance::all();
         // dd($attendance);
 
