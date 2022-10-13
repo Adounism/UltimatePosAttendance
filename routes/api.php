@@ -20,7 +20,20 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-Route::post('/employe', 'EmployeController@store');
-Route::get('/employe', 'EmployeController@index');
-Route::get('/attendance', 'AttendanceController@index');
-Route::post('/attendance', 'AttendanceController@store');
+// Route::resource('/employe', 'EmployeController');
+// // Route::get('/employe', 'EmployeController@index');
+// Route::put('/employe', 'EmployeController@store');
+// Route::resource('/attendance', 'AttendanceController');
+// Route::post('/attendance', 'AttendanceController@store');
+// Route::put('/employe{id}', 'AttendanceController@update')->name('employe.update');
+// Route::get('/ping', 'DeviceController@ping');
+
+Route::middleware(['cors'])->group(function () {
+    Route::resource('/employe', 'EmployeController');
+    // Route::get('/employe', 'EmployeController@index');
+    Route::put('/employe', 'EmployeController@store');
+    Route::resource('/attendance', 'AttendanceController');
+    Route::post('/attendance', 'AttendanceController@store');
+    Route::put('/employe{id}', 'AttendanceController@update')->name('employe.update');
+    Route::get('/ping', 'DeviceController@ping');
+});

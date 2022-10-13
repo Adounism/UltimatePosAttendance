@@ -98,10 +98,26 @@ class AdminSidebarMenu
                             );
                         }
                     },
-                    ['icon' => 'fa fas fa-address-book', 'id' => "tour_step4"]
+                    ['icon' => 'fa fa-id-card', 'id' => "tour_step4"]
                 )->order(15);
             }
 
+            //Device management dropdown
+            if (auth()->user()->can('user.view') || auth()->user()->can('user.create') || auth()->user()->can('roles.view')) {
+                $menu->dropdown(
+                    "Gestion des appareils",
+                    function ($sub) {
+                        if (auth()->user()->can('user.view')) {
+                            $sub->url(
+                                action('DeviceController@index'),
+                                "Liste des appareils",
+                                ['icon' => 'fa fas fa-user', 'active' => request()->segment(1) == 'devices']
+                            );
+                        }
+                    },
+                    ['icon' => 'fa fa-tablet']
+                )->order(10);
+            }
 
             //Contacts dropdown
             if (auth()->user()->can('supplier.view') || auth()->user()->can('customer.view') || auth()->user()->can('supplier.view_own') || auth()->user()->can('customer.view_own')) {

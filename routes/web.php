@@ -75,9 +75,15 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     // Route::post('/register_employer', 'EmployeController@store');
 
     Route::resource('/employe', 'EmployeController');
-    Route::resource('/attendance', 'AttendanceController');
+    Route::resource('/attendance/{employe_id', 'AttendanceController');
 
-    Route::post('/register_employer', 'EmployeController@store');
+
+    //Devices management
+    Route::get('/devices', 'DeviceController@index')->name('device.index');
+    Route::get('/devices/{id}/toggle', 'DeviceController@toggle')->name('device.toggle');
+    Route::get('/devices/{id}/delete', 'DeviceController@delete')->name('device.delete');
+    Route::delete('/devices/{id}/delete', 'DeviceController@delete')->name('device.delete');
+
 
 
     Route::post('check-mobile', 'ContactController@checkMobile');

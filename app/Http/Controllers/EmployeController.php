@@ -44,12 +44,10 @@ class EmployeController extends Controller
     public function store(Request $request)
     {
     
-
-        $request->validate([
-            'firstName' =>'required',
-            'lastName' => 'required',
-            'contact' =>'required'
-        ]);
+        // $employe = new Employe();
+        // $employe->firstName = $request->input('firstName');
+        // $employe->lastName = $request->input('lastName');
+        // $employe->contact = $request->input('contact');
 
         $employe = new Employe([
             'firstName' => $request->get('firstName'),
@@ -57,7 +55,7 @@ class EmployeController extends Controller
             'contact' => $request->get('contact'),
             'faceId' => $request->get('faceId')
         ]);
-
+    
         $employe->save();
 
         return response()->json($employe);
@@ -95,14 +93,16 @@ class EmployeController extends Controller
     public function update(Request $request, $id)
     {
         $employe = Employe::findOrFail($id);
-
-        $request->validate([
-          'name' => 'required',
-          'faceId' => 'required'
-        ]);
-      
-        $employe->name = $request->get('name');
-        $employe->text = $request->get('faceId');
+        // $request->validate([
+            //   'firstName' => 'required',
+            //   'faceId' => 'required'
+            // ]);
+            
+            $employe->firstName = $request->get('firstName');
+            $employe->lastName = $request->get('lastName');
+            $employe->contact = $request->get('contact');
+            $employe->faceId = $request->get('faceId');
+            var_dump(json_decode($employe));
       
         $employe->save();
       
@@ -115,8 +115,11 @@ class EmployeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Employe $employe)
     {
-        //
+    
+        $employe->delete();
+
+        return response()->json(['message'=>'employe deleted successfull','data'=>$employe],200);
     }
 }

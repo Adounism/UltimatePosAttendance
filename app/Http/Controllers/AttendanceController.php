@@ -9,6 +9,9 @@ use Spatie\Activitylog\Models\Activity;
 use Illuminate\Support\Facades\Auth;
 
 use App\Attendance;
+use App\Device;
+use App\Employe;
+use Exception;
 use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
@@ -61,21 +64,44 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'employe_id' =>'required',
-            'heure_arriver' =>'required',
-            'heure_deppart' => 'required',
-        ]);
+        $faceId = $request->faceId;
 
+        $employeface = Employe::where('faceId', $faceId)->first();
         $attendance = new Attendance([
-            'employe_id' => $request->get('employe_id'),
             'heure_arriver' => $request->get('heure_arriver'),
-            'heure_deppart' => $request->get('heure_deppart'),
         ]);
+        $macAddress = substr(exec('getmac'), 0, 17);
+        $device = Device::where("macAdress", $macAddress)->first();
+        var_dump(json_decode($device));
+        dd();
+        if ($device !== null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Votre requête est en cours de traitement'
+            ], 200);
 
-        $attendance->save();
 
-        return response()->json($attendance);
+            if(!isset($faceId) ){
+                if($employeface->attendance()->save($attendance)){
+                    return response()->json(['message'=>'attendance Saved','data'=>$attendance],200);
+                }else{
+                    return response()->json(['message'=>'Employer non Enregistrer','data'=>$faceId], 500);
+                }
+                
+                
+            }
+        }
+
+        
+
+
+        var_dump(json_decode($faceId));
+        return response()->json(['message'=>'Employer Face Id non valide','data'=>$faceId],500);
+
+
+        // $attendance->save();
+
+        // return response()->json($attendance);
     }
 
     /**
@@ -109,7 +135,32 @@ class AttendanceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $data = new Attendance([
+            'heure_arriver' => $request->get('heure_arriver'),
+        ]);
+        
+        //$attendance = Attendance::where('id', $id)->update($data, $id);
+        // if(!$attendance ===null){
+
+        //     if($attendance->attendance()->save($attendance)){
+        //         return response()->json(['message'=>'attendance Saved','data'=>$attendance], 200);
+        //     }
+        // }
+
+        try {
+            $attendance = Attendance::findOrFail($id);
+            // $data = Attendance::where('id', $id)->update($data, $id);
+            var_dump(json_decode($attendance));
+
+
+            if (is_null($attendance))
+                return $this->responseError(null, 'Attendance Not Found', 402);
+
+            return $this->responseSuccess($data, 'Attendance Updated Successfully !');
+        } catch (\Exception $e) {
+            return $this->responseError(null, $e->getMessage(), 500);
+        }
+
     }
 
     /**
@@ -120,6 +171,25 @@ class AttendanceController extends Controller
      */
     public function destroy($id)
     {
-        //
+
+        $attendance = Attendance::findOrFail($id);
+        var_dump(json_decode($attendance));
+        
+        try {
+    
+            if (empty($attendance)) {
+                return $this->responseError(null, 'Product Not Found', 402);
+            }
+
+           
+            if (!$attendance) {
+                return $this->responseError(null, 'Failed to delete the attendance.', 500);
+            }
+
+            return $this->responseSuccess($attendance, 'Attendance Deleted Successfully !');
+        } catch (\Exception $e) {
+            return $this->responseError(null, $e->getMessage(), 500);
+        }
     }
+
 }

@@ -21,7 +21,6 @@ class Attendance extends Model
 
     protected $fillable = [
         'heure_arriver',
-        'heure_deppart',
     ];
 
             /**
