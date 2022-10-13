@@ -16,12 +16,13 @@ class EmployeController extends Controller
     {
         $employe = Employe::all();
 
+     
         if (request()->ajax()) {
       
             return response()->json($employe);
         }
 
-        return view('attendance.employe')->with(compact('employe'));
+         return view('attendance.employe')->with(compact('employe'));
 
     }
 
@@ -58,7 +59,10 @@ class EmployeController extends Controller
     
         $employe->save();
 
-        return response()->json($employe);
+        return response()->json([
+            'success' => $employe->id,
+            'msg' => "Vous êtes enregistrer avec succes"
+         ], 201);
     }
 
     /**
@@ -92,21 +96,17 @@ class EmployeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $employe = Employe::findOrFail($id);
-        // $request->validate([
-            //   'firstName' => 'required',
-            //   'faceId' => 'required'
-            // ]);
-            
-            $employe->firstName = $request->get('firstName');
-            $employe->lastName = $request->get('lastName');
-            $employe->contact = $request->get('contact');
-            $employe->faceId = $request->get('faceId');
-            var_dump(json_decode($employe));
-      
-        $employe->save();
-      
-        return response()->json($employe);
+        //$employe = Employe::findOrFail($id);
+        $employe = Employe::where('id', $id)->first();
+        if($employe !==null){
+            $faceId = $request->request->get("faceId");
+            $employe->faceId = $faceId;
+            $employe->save();
+
+            return response()->json(['msg'=>'Employe update  succes','data'=>$faceId],200);
+        }else{
+            return response()->json(['msg'=>'Employe non existant'], 400);
+        }
     }
 
     /**
@@ -120,6 +120,6 @@ class EmployeController extends Controller
     
         $employe->delete();
 
-        return response()->json(['message'=>'employe deleted successfull','data'=>$employe],200);
+        return response()->json(['msg'=>'employe deleted successfull','data'=>$employe],200);
     }
 }

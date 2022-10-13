@@ -71,33 +71,43 @@ class AttendanceController extends Controller
             'heure_arriver' => $request->get('heure_arriver'),
         ]);
         $macAddress = substr(exec('getmac'), 0, 17);
-        $device = Device::where("macAdress", $macAddress)->first();
-        var_dump(json_decode($device));
-        dd();
+        $device = Device::where("macAddress", $macAddress)->first();
+        // var_dump(json_decode($device));
+        // dd();
         if ($device !== null) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Votre requête est en cours de traitement'
-            ], 200);
+            if ($device->enabled) {
+                return response()->json([
+                    'success' => false,
+                    'msg' => 'Votre requête est en cours de traitement'
+                ], 200);
 
+            }else{
+                return response()->json([
+                    'success' => false,
+                    'msg' => "L'appareil est desactiver veillez l'activer svp!!"
+                ], 401);
+
+            }
 
             if(!isset($faceId) ){
                 if($employeface->attendance()->save($attendance)){
-                    return response()->json(['message'=>'attendance Saved','data'=>$attendance],200);
+                    return response()->json(['msg'=>'attendance Saved','data'=>$attendance],200);
                 }else{
-                    return response()->json(['message'=>'Employer non Enregistrer','data'=>$faceId], 500);
+                    return response()->json(['msg'=>'Employer non Enregistrer','data'=>$faceId], 500);
                 }
                 
                 
             }
-        }
+        }else{
+
+            return response()->json(['msg'=>'Device not valide','data'=>$faceId],500);
+
+        }    
 
         
 
 
-        var_dump(json_decode($faceId));
-        return response()->json(['message'=>'Employer Face Id non valide','data'=>$faceId],500);
-
+        // var_dump(json_decode($faceId));
 
         // $attendance->save();
 

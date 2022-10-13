@@ -8,7 +8,8 @@ use Yajra\DataTables\Facades\DataTables;
 
 class DeviceController extends Controller
 {
-       /**
+
+  /**
      * Afficher la liste des appareils authentifiées
      *
      * @return \Illuminate\Http\Response
@@ -45,6 +46,7 @@ class DeviceController extends Controller
 
     public function ping(Request $request)
     {
+
         if(!$request->isMethod(Request::METHOD_POST)){
             $output = [
                     'success' => false,
@@ -52,20 +54,26 @@ class DeviceController extends Controller
             ];
             return redirect()->route("device.index")->with('status', $output);
         }
-        $platform = request()->headers->get('sec-ch-ua-platform', null);
+        $platform = request()->headers->get('user-agent', null);
 
         if ($platform === null) {
             return response()->json([
                 'success' => false,
-                'message' => 'Platforme invalide .'
+                'msg' => 'Platforme invalide .'
             ], 403);
         }
         $macAddress = substr(exec('getmac'), 0, 17);
         $existAdresse = Device::where("macAddress", $macAddress)->first();
         if ($existAdresse !== null) {
+            if ($existAdresse->enabled) {
+                return response()->json([
+                   'success' => true,
+                   'msg' => "Vous êtes authentifiés"
+                ], 200);
+            }
             return response()->json([
                 'success' => false,
-                'message' => 'Votre requête est en cours de traitement'
+                'msg' => 'Votre requête est en cours de traitement'
             ], 200);
         }
         $adresse = new Device();
@@ -74,7 +82,7 @@ class DeviceController extends Controller
         $adresse->save();
         return response()->json([
             'success' => true,
-            'message' => 'Votre requête est en cours de traitement'
+            'msg' => 'Votre requête est en cours de traitement'
         ], 201);
     }
     function delete($id)
