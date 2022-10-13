@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Employe;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class EmployeController extends Controller
 {
@@ -14,15 +15,42 @@ class EmployeController extends Controller
      */
     public function index()
     {
-        $employe = Employe::all();
+        // $employe = Employe::all();
 
      
-        if (request()->ajax()) {
+        // if (request()->ajax()) {
       
-            return response()->json($employe);
-        }
+        //     return response()->json($employe);
+        // }
 
-         return view('attendance.employe')->with(compact('employe'));
+        //  return view('attendance.employe')->with(compact('employe'));
+
+         $employe = \App\Employe::all();
+         if (request()->ajax()) {
+             return DataTables::of($employe)
+                 ->addColumn('action', function ($row) {
+                     $state = $row->enabled ? ['Désactiver','danger'] : ['Activer','success'];
+                     $action = '';
+                    //  if (auth()->user()->can('user.view')) {
+                    //      $action .= '<a href="' . action('DeviceController@toggle', [$row->id]) . '" class="btn btn-xs btn-'.$state[1].'"><i class="glyphicon glyphicon-edit"></i> ' .$state[0] . '</a>';
+ 
+                    //      $action .= '&nbsp
+                    //  <button data-href="' . action('DeviceController@delete', [$row->id]) . '" class="btn btn-xs btn-danger delete_device_button"><i class="glyphicon glyphicon-trash"></i> ' . __("messages.delete") . '</button>';
+                    //  }
+                     return $action;
+                 })
+                 ->editColumn('enabled', function ($row) {
+                     if ($row->enabled) {
+                         return '<span class="badge badge-success">Active</span>';
+                     }
+                     return '<span class="badge badge-danger">Inactive</span>';
+                 })
+                 ->removeColumn('id')
+                 ->removeColumn('updated_at')
+                 ->rawColumns([2, 4])
+                 ->make(false);
+         }
+         return view('attendance.employe', compact('employe'));
 
     }
 
@@ -57,12 +85,21 @@ class EmployeController extends Controller
             'faceId' => $request->get('faceId')
         ]);
     
-        $employe->save();
+        if($employe !== null){
 
-        return response()->json([
-            'success' => $employe->id,
-            'msg' => "Vous êtes enregistrer avec succes"
-         ], 201);
+            $employe->save();
+    
+            return response()->json([
+                'success' => $employe->id,
+                'msg' => "Employée ajouté avec succes"
+             ], 201);
+        }else{
+            return response()->json([
+                'success' => false,
+                'msg' => "employe donne invalide"
+             ], 400);
+
+        }
     }
 
     /**
@@ -100,12 +137,17 @@ class EmployeController extends Controller
         $employe = Employe::where('id', $id)->first();
         if($employe !==null){
             $faceId = $request->request->get("faceId");
-            $employe->faceId = $faceId;
-            $employe->save();
+            if($faceId !==null){
+                $employe->faceId = $faceId;
+                $employe->save();
+    
+                return response()->json(['msg'=>'Visage ajouté avec succes '],200);
+            }else{
 
-            return response()->json(['msg'=>'Employe update  succes','data'=>$faceId],200);
+                return response()->json(['msg'=>'Visage introuvable'],404);
+            }
         }else{
-            return response()->json(['msg'=>'Employe non existant'], 400);
+            return response()->json(['msg'=>'Employe non existant'], 404);
         }
     }
 

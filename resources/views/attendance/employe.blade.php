@@ -1,65 +1,92 @@
+
+
+
+
+
+
+
+
 @extends('layouts.app')
-@section('title', __('product.variations'))
+@section('title', 'Gestion des employée')
 
 @section('content')
-
-<!-- Content Header (Page header) -->
 <section class="content-header">
-    <h1>Employé Liste
-        <!-- <small>@lang('lang_v1.manage_product_variations')</small> -->
-    </h1>
-    <!-- <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
-        <li class="active">Here</li>
-    </ol> -->
+    <h1>Gestion des employée</h1>
 </section>
-
 <!-- Main content -->
 <section class="content">
-    @component('components.widget', ['class' => 'box-primary', 'title' => "Today Attendance"])
-    @slot('tool')
-    <!-- <div class="box-tools">
-                <button type="button" class="btn btn-block btn-primary btn-modal" 
-                data-href="{{action('VariationTemplateController@create')}}" 
-                data-container=".variation_modal">
-                <i class="fa fa-plus"></i> @lang('messages.add')</button>
-            </div> -->
-    @endslot
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped" id="variation_table">
-            <thead>
-                <tr>
-                    <th>firstName</th>
-                    <th>lastName</th>
-                    <th>Face Id</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            @if(!empty($employe[0]))
-            @foreach($employe as $emp)
-            <tr>
 
-                <td>{{$emp->firstName}}</td>
-                <td>{{$emp->lastName}}</td>
-                <td>{{$emp->faceId}}</td>
+    @component('components.widget', ['class' => 'box-primary', 'title' => 'Toutes les appareils'])
+    @can('roles.view')
 
-            </tr>
-            @endforeach
-            @else
+    @if (count($employe)>0)
+    <table class="table table-bordered table-striped" id="devices_table">
+        <thead>
             <tr>
-                <td colspan="4" class="text-center">
-                    -
-                </td>
+                <th>firstName</th>
+                <th>lastName</th>
+                <th>Face Id</th>
+                <th>Status</th>
+                <th>@lang( 'messages.action' )</th>
             </tr>
-            @endif
-        </table>
+        </thead>
+    </table>
+    @else
+    <div class="alert alert-info">
+        <a class="close" data-dismiss="alert" href="#">×</a>
+        Nous n'avons pas trouvé d'employé.
     </div>
+    @endif
+
+    @endcan
     @endcomponent
 
-    <div class="modal fade variation_modal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
-    </div>
-
 </section>
-<!-- /.content -->
+@stop
+@section('javascript')
+<script type="text/javascript">
+    //Roles table
+    $(document).ready(function() {
+        var devices_table = $('#devices_table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: '/employe',
+            buttons: [],
+            columnDefs: [{
+                "targets": 1,
+                "orderable": false,
+                "searchable": false
+            }]
+        });
+        $(document).on('click', 'button.delete_device_button', function() {
+            swal({
+                title: LANG.sure,
+                text: "This device will be deleted.",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            }).then((willDelete) => {
+                if (willDelete) {
+                    var href = $(this).data('href');
+                    var data = $(this).serialize();
 
+                    $.ajax({
+                        method: "DELETE",
+                        url: href,
+                        dataType: "json",
+                        data: data,
+                        success: function(result) {
+                            if (result.success == true) {
+                                toastr.success(result.msg);
+                                devices_table.ajax.reload();
+                            } else {
+                                toastr.error(result.msg);
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
 @endsection

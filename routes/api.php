@@ -20,21 +20,21 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-Route::resource('/employe', 'EmployeController');
-// Route::get('/employe', 'Em+ployeController@index');
-Route::put('/employe', 'EmployeController@store');
-Route::resource('/attendance', 'AttendanceController');
-Route::post('/attendance', 'AttendanceController@store');
-Route::put('/employe{id}', 'AttendanceController@update')->name('employe.update');
-Route::post('/ping', 'DeviceController@ping');
+// Route::resource('/employe', 'EmployeController');
+// // Route::get('/employe', 'Em+ployeController@index');
+// Route::put('/employe', 'EmployeController@store');
+// Route::resource('/attendance', 'AttendanceController');
+// Route::post('/attendance', 'AttendanceController@store');
+// Route::put('/employe{id}', 'AttendanceController@update')->name('employe.update');
+// Route::post('/ping', 'DeviceController@ping');
 
-// Route::middleware(['cors'])->group(function () {
-//     Route::resource('/employe', 'EmployeController');
-//     Route::get('/employe', 'EmployeController@index');
-//     Route::put('/employe', 'EmployeController@store');
-//     Route::resource('/attendance', 'AttendanceController');
-//     Route::post('/attendance', 'AttendanceController@store');
-//     Route::put('/employe{id}', 'AttendanceController@update')->name('employe.update');
-//     Route::post('/ping', 'DeviceController@ping');
-// });
+Route::middleware(['cors'])->group(function () {
+    Route::resource('/employe', 'EmployeController');
+    Route::get('/employe', 'EmployeController@index');
+    Route::put('/employe', 'EmployeController@store');
+    Route::resource('/attendance', 'AttendanceController');
+    Route::post('/attendance', 'AttendanceController@store');
+    Route::put('/employe{id}', 'AttendanceController@update')->name('employe.update');
+    Route::post('/ping', 'DeviceController@ping');
+});
 

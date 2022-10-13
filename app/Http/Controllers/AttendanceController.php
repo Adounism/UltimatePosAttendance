@@ -64,22 +64,33 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
-        $faceId = $request->faceId;
+        $faceId = $request->request->get("faceId");
 
-        $employeface = Employe::where('faceId', $faceId)->first();
-        $attendance = new Attendance([
-            'heure_arriver' => $request->get('heure_arriver'),
-        ]);
+        $employeface = Employe::where("faceId", $faceId)->first();
+
+ 
+   
         $macAddress = substr(exec('getmac'), 0, 17);
         $device = Device::where("macAddress", $macAddress)->first();
         // var_dump(json_decode($device));
         // dd();
+
         if ($device !== null) {
             if ($device->enabled) {
-                return response()->json([
-                    'success' => false,
-                    'msg' => 'Votre requête est en cours de traitement'
-                ], 200);
+                 if($employeface !==null){
+                    if(isset($faceId)){
+                        // $employeface->attendance()->save($employeface);
+                        $heure_arriver = date('d-m-y h:i:s');
+                        $attendance = new Attendance([
+                            'employe_id' => $employeface->id,
+                            'heure_arriver' => $heure_arriver
+                        ]);
+                        $attendance->save();
+                        return response()->json(['success' => true, 'msg'=>'Presence ajouté avec succes'],201);                
+                    }
+                }else{
+                    return response()->json(['success' => false, 'message'=>'utilisateur introuvale'], 404);
+                }
 
             }else{
                 return response()->json([
@@ -89,15 +100,14 @@ class AttendanceController extends Controller
 
             }
 
-            if(!isset($faceId) ){
-                if($employeface->attendance()->save($attendance)){
-                    return response()->json(['msg'=>'attendance Saved','data'=>$attendance],200);
-                }else{
-                    return response()->json(['msg'=>'Employer non Enregistrer','data'=>$faceId], 500);
-                }
-                
-                
-            }
+            // if(!isset($faceId) ){
+            //     if($employeface->attendance()->save($attendance)){
+            //         return response()->json(['msg'=>'attendance Saved','data'=>$attendance],200);
+            //     }else{
+            //         return response()->json(['msg'=>'Employer non Enregistrer','data'=>$faceId], 500);
+            //     }
+                 
+            // }
         }else{
 
             return response()->json(['msg'=>'Device not valide','data'=>$faceId],500);

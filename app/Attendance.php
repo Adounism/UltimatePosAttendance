@@ -20,6 +20,7 @@ class Attendance extends Model
     }
 
     protected $fillable = [
+        'employe_id',
         'heure_arriver',
     ];
 
